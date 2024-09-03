@@ -1,11 +1,14 @@
 package models
 
-import "time"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Expense struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Name      string    `json:"name"`
-	Category  string    `json:"category"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Name      string             `bson:"name,omitempty" json:"name,omitempty"`
+	Category  string             `bson:"email,omitempty" json:"category"`
+	Price     uint               `bson:"price,omitempty" json:"price"`
+	CreatedAt primitive.DateTime `bson:"created_at,omitempty" json:"created_at"`
+	UpdatedAt primitive.DateTime `bson:"updated_at,omitempty" json:"updated_at"`
 }
