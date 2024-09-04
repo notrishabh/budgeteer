@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/notrishabh/finance-tracker/pkg/models"
 	"github.com/notrishabh/finance-tracker/pkg/services"
 )
@@ -21,6 +22,16 @@ func CreateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	var expense models.Expense
 	json.NewDecoder(r.Body).Decode(&expense)
 	err := services.CreateExpense(&expense)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(expense)
+}
+
+func GetExpenseByIdHandler(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	expense, err := services.GetExpenseById(params["id"])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

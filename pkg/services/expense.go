@@ -13,3 +13,7 @@ func CreateExpense(expense *models.Expense) error {
 	_, err := repository.CreateExpense(expense)
 	return err
 }
+
+func GetExpenseById(id string) (*models.Expense, error) {
+	return repository.GetExpenseById(id)
+}

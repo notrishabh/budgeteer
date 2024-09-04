@@ -57,3 +57,14 @@ func CreateExpense(expense *models.Expense) (*mongo.InsertOneResult, error) {
 	expense.UpdatedAt = expense.CreatedAt
 	return expenseCollection.InsertOne(context.Background(), expense)
 }
+
+func GetExpenseById(id string) (*models.Expense, error) {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var expense models.Expense
+	err = expenseCollection.FindOne(context.Background(), bson.M{"_id": objectID}).Decode(&expense)
+	return &expense, err
+}
