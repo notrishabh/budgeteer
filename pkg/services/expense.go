@@ -9,8 +9,13 @@ func GetExpense() ([]models.Expense, error) {
 	return repository.GetExpenses()
 }
 
-func CreateExpense(expense *models.Expense) error {
-	_, err := repository.CreateExpense(expense)
+func CreateCategory(category *models.Category) error {
+	_, err := repository.CreateCategory(category)
+	return err
+}
+
+func CreateExpense(expense *models.Expense, category string) error {
+	_, err := repository.CreateExpense(expense, category)
 	return err
 }
 

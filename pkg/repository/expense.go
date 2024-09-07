@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -13,12 +15,17 @@ import (
 )
 
 var expenseCollection *mongo.Collection
+var categoryCollection *mongo.Collection
 
 func InitRepo() {
 	if db.Client != nil {
 		expenseCollection = db.Client.Database("finance-tracker").Collection("expense")
+		categoryCollection = db.Client.Database("finance-tracker").Collection("category")
 		if expenseCollection == nil {
 			log.Fatal("Failed to initialize expenseCollection")
+		}
+		if categoryCollection == nil {
+			log.Fatal("Failed to initialize categoryCollection")
 		}
 	} else {
 		log.Fatal("mongodb cient is not initialized")
@@ -51,10 +58,51 @@ func GetExpenses() ([]models.Expense, error) {
 	return expenses, nil
 }
 
-func CreateExpense(expense *models.Expense) (*mongo.InsertOneResult, error) {
+func CreateCategory(category *models.Category) (*mongo.InsertOneResult, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.M{"name": category.Name}
+
+	var foundCategory models.Category
+
+	err := categoryCollection.FindOne(ctx, filter).Decode(&foundCategory)
+	if err != nil && err != mongo.ErrNoDocuments {
+		return nil, err
+	}
+	if err == nil && foundCategory != (models.Category{}) {
+		msg := fmt.Sprintf("Category %s already exists.", foundCategory.Name)
+		return nil, errors.New(msg)
+	}
+
+	category.UserMade = true
+	category.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
+	category.UpdatedAt = category.CreatedAt
+
+	return categoryCollection.InsertOne(context.Background(), category)
+}
+
+func CreateExpense(expense *models.Expense, category string) (*mongo.InsertOneResult, error) {
 	expense.ID = primitive.NewObjectID()
 	expense.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	expense.UpdatedAt = expense.CreatedAt
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.M{"name": category}
+
+	var foundCategory models.Category
+
+	err := categoryCollection.FindOne(ctx, filter).Decode(&foundCategory)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.New("Category not found. Please create a new category.")
+		}
+		return nil, err
+	}
+	expense.Category = foundCategory
+
 	return expenseCollection.InsertOne(context.Background(), expense)
 }
 

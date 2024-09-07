@@ -7,7 +7,7 @@ import (
 type Expense struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Name      string             `bson:"name,omitempty" json:"name,omitempty"`
-	Category  string             `bson:"email,omitempty" json:"category"`
+	Category  Category           `bson:"category,omitempty" json:"category"`
 	Price     uint               `bson:"price,omitempty" json:"price"`
 	CreatedAt primitive.DateTime `bson:"created_at,omitempty" json:"created_at"`
 	UpdatedAt primitive.DateTime `bson:"updated_at,omitempty" json:"updated_at"`

@@ -18,12 +18,42 @@ func GetExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(expenses)
 }
 
-func CreateExpenseHandler(w http.ResponseWriter, r *http.Request) {
-	var expense models.Expense
-	json.NewDecoder(r.Body).Decode(&expense)
-	err := services.CreateExpense(&expense)
+func CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	var category models.Category
+	json.NewDecoder(r.Body).Decode(&category)
+	err := services.CreateCategory(&category)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(category)
+}
+
+func CreateExpenseHandler(w http.ResponseWriter, r *http.Request) {
+	var rawBody map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&rawBody)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	category, ok := rawBody["category"].(string)
+	if !ok {
+		http.Error(w, "category is required", http.StatusBadRequest)
+		return
+	}
+
+	var expense models.Expense
+	expenseData, err := json.Marshal(rawBody)
+	if err != nil {
+		http.Error(w, "Error processing expense data", http.StatusInternalServerError)
+		return
+	}
+
+	json.Unmarshal(expenseData, &expense)
+	error := services.CreateExpense(&expense, category)
+	if error != nil {
+		http.Error(w, error.Error(), http.StatusInternalServerError)
 		return
 	}
 	json.NewEncoder(w).Encode(expense)
