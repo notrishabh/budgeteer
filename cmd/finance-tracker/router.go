@@ -7,6 +7,7 @@ import (
 
 func InitRouter() *mux.Router {
 	r := mux.NewRouter()
+	r.HandleFunc("/user", handlers.CreateUserHandler).Methods("POST")
 	r.HandleFunc("/expenses", handlers.GetExpenseHandler).Methods("GET")
 	r.HandleFunc("/expenses/category", handlers.CreateCategoryHandler).Methods("POST")
 	r.HandleFunc("/expenses", handlers.CreateExpenseHandler).Methods("POST")

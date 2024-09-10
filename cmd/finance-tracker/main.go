@@ -11,6 +11,7 @@ import (
 func main() {
 	db.Init()
 	repository.InitRepo()
+	repository.InitUserRepo()
 	router := InitRouter()
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
