@@ -27,7 +27,7 @@ func GetExpenseHandler(w http.ResponseWriter, r *http.Request) {
 func CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	user := middleware.GetUserFromContext(r.Context())
 	if user == nil {
-		http.Error(w, "User not found, please login again.", http.StatusUnauthorized)
+		http.Error(w, "Please login again.", http.StatusUnauthorized)
 		return
 	}
 
