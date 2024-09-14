@@ -1,12 +1,18 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/notrishabh/finance-tracker/pkg/utils"
 )
+
+// Create a context key for storing user info
+type contextKey string
+
+const userContextKey = contextKey("user")
 
 func IsAuthorized(next http.HandlerFunc, requiredRole string) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +48,18 @@ func IsAuthorized(next http.HandlerFunc, requiredRole string) http.HandlerFunc {
 			return
 		}
 
+		// Send user details to the next middleware
+		ctx := context.WithValue(r.Context(), userContextKey, claims)
+
 		// User is authorized, continue to the next handler
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func GetUserFromContext(ctx context.Context) *utils.Claims {
+	user, ok := ctx.Value(userContextKey).(*utils.Claims)
+	if !ok {
+		return nil
+	}
+	return user
 }

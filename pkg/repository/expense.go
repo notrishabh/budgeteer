@@ -9,6 +9,7 @@ import (
 
 	"github.com/notrishabh/finance-tracker/internal/db"
 	"github.com/notrishabh/finance-tracker/pkg/models"
+	"github.com/notrishabh/finance-tracker/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -58,7 +59,7 @@ func GetExpenses() ([]models.Expense, error) {
 	return expenses, nil
 }
 
-func CreateCategory(category *models.Category) (*mongo.InsertOneResult, error) {
+func CreateCategory(category *models.Category, userName string) (*mongo.InsertOneResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -73,6 +74,11 @@ func CreateCategory(category *models.Category) (*mongo.InsertOneResult, error) {
 	if err == nil && foundCategory != (models.Category{}) {
 		msg := fmt.Sprintf("Category %s already exists.", foundCategory.Name)
 		return nil, errors.New(msg)
+	}
+
+	category.UserID, err = utils.GetUserIDfromUsername(userName)
+	if err != nil {
+		return nil, err
 	}
 
 	category.UserMade = true

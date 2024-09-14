@@ -47,7 +47,7 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := map[string]interface{}{
-		"id":       loggedInUser.ID.Hex(),
+		"id":       loggedInUser.ID,
 		"username": loggedInUser.Username,
 		"role":     loggedInUser.Role,
 		"token":    token,

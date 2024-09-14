@@ -5,11 +5,17 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/notrishabh/finance-tracker/pkg/middleware"
 	"github.com/notrishabh/finance-tracker/pkg/models"
 	"github.com/notrishabh/finance-tracker/pkg/services"
 )
 
 func GetExpenseHandler(w http.ResponseWriter, r *http.Request) {
+	user := middleware.GetUserFromContext(r.Context())
+	if user == nil {
+		http.Error(w, "User not found, please login again.", http.StatusUnauthorized)
+		return
+	}
 	expenses, err := services.GetExpense()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -19,9 +25,15 @@ func GetExpenseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	user := middleware.GetUserFromContext(r.Context())
+	if user == nil {
+		http.Error(w, "User not found, please login again.", http.StatusUnauthorized)
+		return
+	}
+
 	var category models.Category
 	json.NewDecoder(r.Body).Decode(&category)
-	err := services.CreateCategory(&category)
+	err := services.CreateCategory(&category, user.Username)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
