@@ -3,9 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/notrishabh/finance-tracker/pkg/models"
 	"github.com/notrishabh/finance-tracker/pkg/services"
+	"github.com/notrishabh/finance-tracker/pkg/utils"
 )
 
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,10 +40,18 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	token, err := utils.GenerateJWT(loggedInUser.Username, loggedInUser.Role)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	response := map[string]interface{}{
 		"id":       loggedInUser.ID.Hex(),
 		"username": loggedInUser.Username,
 		"role":     loggedInUser.Role,
+		"token":    token,
+		"expires":  time.Now().Add(24 * time.Hour).Unix(),
 	}
 
 	json.NewEncoder(w).Encode(response)

@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/notrishabh/finance-tracker/internal/db"

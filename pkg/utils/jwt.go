@@ -12,7 +12,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-var jwtKey = []byte("your_secret_key") // Secret key for signing
+var JwtKey = []byte("your_secret_key") // Secret key for signing
 
 // GenerateJWT generates a new JWT token for an authenticated user
 func GenerateJWT(username, role string) (string, error) {
@@ -26,6 +26,6 @@ func GenerateJWT(username, role string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
+	tokenString, err := token.SignedString(JwtKey)
 	return tokenString, err
 }
