@@ -14,8 +14,8 @@ func CreateCategory(category *models.Category, userName string) error {
 	return err
 }
 
-func CreateExpense(expense *models.Expense, category string) error {
-	_, err := repository.CreateExpense(expense, category)
+func CreateExpense(expense *models.Expense, category string, userName string) error {
+	_, err := repository.CreateExpense(expense, category, userName)
 	return err
 }
 

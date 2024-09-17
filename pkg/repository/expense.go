@@ -81,6 +81,7 @@ func CreateCategory(category *models.Category, userName string) (*mongo.InsertOn
 		return nil, err
 	}
 
+	category.ID = primitive.NewObjectID()
 	category.UserMade = true
 	category.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	category.UpdatedAt = category.CreatedAt
@@ -88,7 +89,7 @@ func CreateCategory(category *models.Category, userName string) (*mongo.InsertOn
 	return categoryCollection.InsertOne(context.Background(), category)
 }
 
-func CreateExpense(expense *models.Expense, category string) (*mongo.InsertOneResult, error) {
+func CreateExpense(expense *models.Expense, category string, userName string) (*mongo.InsertOneResult, error) {
 	expense.ID = primitive.NewObjectID()
 	expense.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
 	expense.UpdatedAt = expense.CreatedAt
@@ -108,6 +109,11 @@ func CreateExpense(expense *models.Expense, category string) (*mongo.InsertOneRe
 		return nil, err
 	}
 	expense.Category = foundCategory
+
+	expense.UserID, err = utils.GetUserIDfromUsername(userName)
+	if err != nil {
+		return nil, err
+	}
 
 	return expenseCollection.InsertOne(context.Background(), expense)
 }

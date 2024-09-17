@@ -42,6 +42,11 @@ func CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateExpenseHandler(w http.ResponseWriter, r *http.Request) {
+	user := middleware.GetUserFromContext(r.Context())
+	if user == nil {
+		http.Error(w, "User not found, please login again.", http.StatusUnauthorized)
+		return
+	}
 	var rawBody map[string]interface{}
 	err := json.NewDecoder(r.Body).Decode(&rawBody)
 	if err != nil {
@@ -63,7 +68,7 @@ func CreateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.Unmarshal(expenseData, &expense)
-	error := services.CreateExpense(&expense, category)
+	error := services.CreateExpense(&expense, category, user.Username)
 	if error != nil {
 		http.Error(w, error.Error(), http.StatusInternalServerError)
 		return
