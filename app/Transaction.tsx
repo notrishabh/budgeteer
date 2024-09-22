@@ -1,7 +1,14 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export default function Transaction() {
+export type Transaction = {
+  id: number;
+  name: string;
+  price: number;
+  category: string;
+  date: string;
+};
+
+export default function Transaction({ data }: { data: Transaction }) {
   return (
     <div className="rounded-xl shadow shadow-gray-300 p-4 flex gap-4 items-center">
       <Avatar>
@@ -9,11 +16,10 @@ export default function Transaction() {
         <AvatarFallback>CN</AvatarFallback>
       </Avatar>
       <div>
-        <h4 className="text-xl font-semibold">Milk and Bread</h4>
+        <h4 className="text-xl font-semibold">{data.name}</h4>
         <p className="text-sm text-muted-foreground">Grocery</p>
         <p className="text-sm text-muted-foreground">15th March</p>
       </div>
-      {/*move this element to the right of the flex box*/}
       <div className="ml-auto">
         <h4 className="font-semibold text-xl">-₹ 200</h4>
       </div>
