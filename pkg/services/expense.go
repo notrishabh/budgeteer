@@ -5,8 +5,8 @@ import (
 	"github.com/notrishabh/finance-tracker/pkg/repository"
 )
 
-func GetExpense() ([]models.Expense, error) {
-	return repository.GetExpenses()
+func GetExpense(userName string) ([]models.Expense, error) {
+	return repository.GetExpenses(userName)
 }
 
 func CreateCategory(category *models.Category, userName string) error {

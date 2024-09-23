@@ -33,12 +33,17 @@ func InitRepo() {
 	}
 }
 
-func GetExpenses() ([]models.Expense, error) {
+func GetExpenses(userName string) ([]models.Expense, error) {
 	var expenses []models.Expense
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	cursor, err := expenseCollection.Find(context.Background(), bson.M{})
+	UserID, err := utils.GetUserIDfromUsername(userName)
+	if err != nil {
+		return nil, err
+	}
+
+	cursor, err := expenseCollection.Find(ctx, bson.M{"user_id": UserID})
 	if err != nil {
 		return nil, err
 	}

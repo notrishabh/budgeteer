@@ -16,7 +16,7 @@ func GetExpenseHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User not found, please login again.", http.StatusUnauthorized)
 		return
 	}
-	expenses, err := services.GetExpense()
+	expenses, err := services.GetExpense(user.Username)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
