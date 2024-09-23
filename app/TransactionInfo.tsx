@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Transaction from "./Transaction";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TransactionInfo() {
   const { data, isLoading } = useQuery({
@@ -18,20 +19,26 @@ export default function TransactionInfo() {
       return response.json();
     },
   });
-  if (!isLoading) {
-    console.log(data);
-  }
-  return (
-    <div className="space-y-4">
-      {isLoading ? (
-        <p>loading...</p>
-      ) : (
-        <>
-          {data.map((transaction) => (
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="rounded-xl h-24 w-full" />
+        <Skeleton className="rounded-xl h-24 w-full" />
+        <Skeleton className="rounded-xl h-24 w-full" />
+        <Skeleton className="rounded-xl h-24 w-full" />
+      </div>
+    );
+  } else {
+    return (
+      <div className="space-y-4">
+        {data ? (
+          data.map((transaction) => (
             <Transaction key={transaction.id} data={transaction} />
-          ))}
-        </>
-      )}
-    </div>
-  );
+          ))
+        ) : (
+          <p>No transactions found.</p>
+        )}
+      </div>
+    );
+  }
 }
