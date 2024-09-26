@@ -1,11 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Transaction from "./Transaction";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TTransaction } from "@/types/types";
+import Transaction from "./Transaction";
 
 export default function TransactionInfo() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<TTransaction[]>({
     queryKey: ["transactions"],
     queryFn: async () => {
       const response = await fetch("http://localhost:8080/expenses", {
@@ -13,7 +14,7 @@ export default function TransactionInfo() {
         headers: {
           "Content-Type": "application/json",
           Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RlciIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNzI3MTIzMDY3fQ.68KNfdZ9CTZL-q5TTB0VODYilXTvkBriNEfYaHEcL2A",
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RlciIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNzI3NDY2MjY3fQ.--EyeVUj7pR0wD3hw1sSyN7K5mguRHjcutbgY7x3IGI",
         },
       });
       return response.json();
@@ -32,7 +33,7 @@ export default function TransactionInfo() {
     return (
       <div className="space-y-4">
         {data ? (
-          data.map((transaction) => (
+          data.map((transaction: TTransaction) => (
             <Transaction key={transaction.id} data={transaction} />
           ))
         ) : (

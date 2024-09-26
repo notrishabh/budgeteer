@@ -18,7 +18,9 @@ export default function Transaction({ data }: { data: TTransaction }) {
         <p className="text-sm text-muted-foreground">{data.category.name}</p>
       </div>
       <div className="ml-auto">
-        <h4 className="font-semibold text-xl">-₹ {data.price}</h4>
+        <h4 className="font-semibold text-xl text-orange-600">
+          -₹ {data.price}
+        </h4>
       </div>
     </div>
   );
