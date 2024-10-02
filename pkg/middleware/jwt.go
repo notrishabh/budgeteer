@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"net/http"
-	"strings"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/notrishabh/finance-tracker/pkg/utils"
@@ -16,20 +15,19 @@ const userContextKey = contextKey("user")
 
 func IsAuthorized(next http.HandlerFunc, requiredRole string) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get jwt token from headers
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			http.Error(w, "Authorization required", http.StatusUnauthorized)
+		// Get jwt token from cookies
+		cookie, err := r.Cookie("token")
+		if err != nil {
+			// If there's no cookie, return unauthorized
+			if err == http.ErrNoCookie {
+				http.Error(w, "Authorization required", http.StatusUnauthorized)
+				return
+			}
+			http.Error(w, "Error retrieving cookie", http.StatusInternalServerError)
 			return
 		}
 
-		parts := strings.Split(authHeader, " ")
-		if len(parts) != 2 || parts[0] != "Bearer" {
-			http.Error(w, "Invalid authorization header format", http.StatusUnauthorized)
-			return
-		}
-
-		tokenStr := parts[1]
+		tokenStr := cookie.Value
 
 		claims := &utils.Claims{}
 
