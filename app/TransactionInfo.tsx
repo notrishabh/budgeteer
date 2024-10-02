@@ -11,10 +11,9 @@ export default function TransactionInfo() {
     queryFn: async () => {
       const response = await fetch("http://localhost:8080/expenses", {
         method: "GET",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RlciIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNzI3NDY2MjY3fQ.--EyeVUj7pR0wD3hw1sSyN7K5mguRHjcutbgY7x3IGI",
         },
       });
       return response.json();

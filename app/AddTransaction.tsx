@@ -1,4 +1,15 @@
 "use client";
+import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { useMutation } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 
@@ -26,11 +37,34 @@ export default function AddTransaction() {
     mutate();
   };
   return (
-    <div
-      className="bg-gradient-to-br from-emerald-800 to-emerald-400 text-white rounded-full p-2"
-      onClick={addTransaction}
-    >
-      <Plus className="h-10 w-10" />
-    </div>
+    <section>
+      <div
+        className="bg-gradient-to-br from-emerald-800 to-emerald-400 text-white rounded-full p-2"
+        onClick={addTransaction}
+      >
+        <Plus className="h-10 w-10" />
+      </div>
+      <RenderDrawer />
+    </section>
   );
 }
+
+const RenderDrawer = () => {
+  return (
+    <Drawer>
+      <DrawerTrigger>Open</DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Are you absolutely sure?</DrawerTitle>
+          <DrawerDescription>This action cannot be undone.</DrawerDescription>
+        </DrawerHeader>
+        <DrawerFooter>
+          <Button>Submit</Button>
+          <DrawerClose>
+            <Button variant="outline">Cancel</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+};
