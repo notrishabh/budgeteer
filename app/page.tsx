@@ -26,9 +26,7 @@ export default function Home() {
         <h4 className="text-2xl font-bold">Transactions</h4>
         <TransactionInfo />
       </div>
-      <div className="absolute bottom-6 right-6">
-        <AddTransaction />
-      </div>
+      <AddTransaction />
     </section>
   );
 }
