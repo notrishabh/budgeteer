@@ -19,12 +19,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, X } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 export default function AddTransaction() {
+  const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: async (body: {
       name: string;
@@ -38,8 +41,9 @@ export default function AddTransaction() {
       });
       return response.json();
     },
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      setOpen(false);
     },
   });
   const formSchema = z.object({
@@ -55,9 +59,13 @@ export default function AddTransaction() {
   }
 
   return (
-    <Drawer>
+    <Drawer open={open}>
       <DrawerTrigger asChild className="fixed bottom-10 right-10">
-        <Button size="icon" className="rounded-full w-12 h-12">
+        <Button
+          size="icon"
+          className="rounded-full w-12 h-12"
+          onClick={() => setOpen(true)}
+        >
           <Plus />
         </Button>
       </DrawerTrigger>
