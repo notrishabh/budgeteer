@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CreditCard from "./CreditCard";
 import TransactionInfo from "./TransactionInfo";
-import AddTransaction from "./AddTransaction";
+import BottomBar from "./BottomBar";
 
 // https://dribbble.com/shots/16492237-Expense-Tracker-App
 export default function Home() {
@@ -22,11 +22,11 @@ export default function Home() {
       <div className="mt-8">
         <CreditCard />
       </div>
-      <div className="space-y-4 mt-8">
+      <div className="space-y-4 mt-8 mb-16">
         <h4 className="text-2xl font-bold">Transactions</h4>
         <TransactionInfo />
       </div>
-      <AddTransaction />
+      <BottomBar />
     </section>
   );
 }

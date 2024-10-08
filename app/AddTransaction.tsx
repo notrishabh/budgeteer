@@ -60,22 +60,19 @@ export default function AddTransaction() {
 
   return (
     <Drawer open={open}>
-      <DrawerTrigger asChild className="fixed bottom-10 right-10">
-        <Button
-          size="icon"
-          className="rounded-full w-12 h-12"
-          onClick={() => setOpen(true)}
-        >
+      <DrawerTrigger asChild>
+        <Button size="icon" onClick={() => setOpen(true)}>
           <Plus />
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="h-5/6 bg-white px-6">
+      <DrawerContent className="h-full bg-white px-6">
         <DrawerHeader className="relative">
           <DrawerClose>
             <Button
               variant="ghost"
               size="icon"
               className="absolute left-0 top-3"
+              onClick={() => setOpen(false)}
             >
               <X />
             </Button>
