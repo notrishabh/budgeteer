@@ -6,7 +6,7 @@ import BottomBar from "./BottomBar";
 // https://dribbble.com/shots/16492237-Expense-Tracker-App
 export default function Home() {
   return (
-    <section>
+    <section className="px-6 py-8">
       <div className="flex justify-between">
         <div>
           <p className="text-sm tracking-tight text-muted-foreground">

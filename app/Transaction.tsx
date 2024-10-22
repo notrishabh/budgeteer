@@ -1,10 +1,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/utils";
 import { TTransaction } from "@/types/types";
+import Link from "next/link";
 
 export default function Transaction({ data }: { data: TTransaction }) {
   return (
-    <div className="rounded-xl shadow shadow-gray-300 p-3 flex gap-4 items-center">
+    <Link
+      href={`/transactions/${data.id}`}
+      className="rounded-xl shadow shadow-gray-300 p-2 flex gap-4 items-center"
+    >
       <div className="flex flex-col items-center text-muted-foreground font-semibold">
         <p>{formatDate(data.created_at).month}</p>
         <p>{formatDate(data.created_at).day}</p>
@@ -22,6 +26,6 @@ export default function Transaction({ data }: { data: TTransaction }) {
           -₹ {data.price}
         </h4>
       </div>
-    </div>
+    </Link>
   );
 }
