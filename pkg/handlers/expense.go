@@ -76,6 +76,26 @@ func CreateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(expense)
 }
 
+func UpdateExpenseHandler(w http.ResponseWriter, r *http.Request) {
+	var expense models.Expense
+	json.NewDecoder(r.Body).Decode(&expense)
+	err := services.UpdateExpense(&expense)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(expense)
+}
+
+func DeleteExpenseHandler(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	err := services.DeleteExpense(params["id"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func GetExpenseByIdHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	expense, err := services.GetExpenseById(params["id"])

@@ -19,6 +19,16 @@ func CreateExpense(expense *models.Expense, category string, userName string) er
 	return err
 }
 
+func UpdateExpense(expense *models.Expense) error {
+	_, err := repository.UpdateExpense(expense)
+	return err
+}
+
+func DeleteExpense(id string) error {
+	_, err := repository.DeleteExpense(id)
+	return err
+}
+
 func GetExpenseById(id string) (*models.Expense, error) {
 	return repository.GetExpenseById(id)
 }

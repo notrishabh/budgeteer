@@ -123,6 +123,19 @@ func CreateExpense(expense *models.Expense, category string, userName string) (*
 	return expenseCollection.InsertOne(context.Background(), expense)
 }
 
+func UpdateExpense(expense *models.Expense) (*mongo.UpdateResult, error) {
+	return expenseCollection.UpdateOne(context.Background(), bson.M{"_id": expense.ID}, bson.M{"$set": expense})
+}
+
+func DeleteExpense(id string) (*mongo.DeleteResult, error) {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return expenseCollection.DeleteOne(context.Background(), bson.M{"_id": objectID})
+}
+
 func GetExpenseById(id string) (*models.Expense, error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
