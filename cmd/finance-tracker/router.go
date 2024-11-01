@@ -17,6 +17,7 @@ func InitRouter() *mux.Router {
 	r.HandleFunc("/user", handlers.CreateUserHandler).Methods("POST")
 	r.HandleFunc("/login", handlers.LoginUserHandler).Methods("POST")
 	r.HandleFunc("/expenses", middleware.IsAuthorized(handlers.GetExpenseHandler, "user")).Methods("GET")
+	r.HandleFunc("/expenses/category", middleware.IsAuthorized(handlers.GetCategoryHandler, "user")).Methods("GET")
 	r.HandleFunc("/expenses/category", middleware.IsAuthorized(handlers.CreateCategoryHandler, "user")).Methods("POST")
 	r.HandleFunc("/expenses", middleware.IsAuthorized(handlers.CreateExpenseHandler, "user")).Methods("POST")
 	r.HandleFunc("/expenses/{id}", middleware.IsAuthorized(handlers.GetExpenseByIdHandler, "user")).Methods("GET")

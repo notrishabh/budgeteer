@@ -24,6 +24,20 @@ func GetExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(expenses)
 }
 
+func GetCategoryHandler(w http.ResponseWriter, r *http.Request) {
+	user := middleware.GetUserFromContext(r.Context())
+	if user == nil {
+		http.Error(w, "User not found, please login again.", http.StatusUnauthorized)
+		return
+	}
+	categories, err := services.GetCategory(user.Username)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(categories)
+}
+
 func CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	user := middleware.GetUserFromContext(r.Context())
 	if user == nil {
@@ -77,9 +91,10 @@ func CreateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateExpenseHandler(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
 	var expense models.Expense
 	json.NewDecoder(r.Body).Decode(&expense)
-	err := services.UpdateExpense(&expense)
+	err := services.UpdateExpense(params["id"], &expense)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

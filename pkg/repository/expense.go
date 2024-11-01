@@ -64,15 +64,71 @@ func GetExpenses(userName string) ([]models.Expense, error) {
 	return expenses, nil
 }
 
+func GetCategories(userName string) ([]models.Category, error) {
+	var categories []models.Category
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	UserID, err := utils.GetUserIDfromUsername(userName)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{
+		"$or": []bson.M{
+			{"user_id": UserID},
+			{"user_made": false},
+			{"user_made": bson.M{"$exists": false}},
+		},
+	}
+
+	cursor, err := categoryCollection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var category models.Category
+		if err := cursor.Decode(&category); err != nil {
+			return nil, err
+		}
+		categories = append(categories, category)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return categories, nil
+}
+
 func CreateCategory(category *models.Category, userName string) (*mongo.InsertOneResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	filter := bson.M{"name": category.Name}
+	userID, err := utils.GetUserIDfromUsername(userName)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{
+		"$or": []bson.M{
+			{
+				"user_made": true,
+				"name":      category.Name,
+				"user_id":   userID,
+			},
+			{
+				"user_made": bson.M{"$exists": false},
+				"name":      category.Name,
+			},
+		},
+	}
 
 	var foundCategory models.Category
 
-	err := categoryCollection.FindOne(ctx, filter).Decode(&foundCategory)
+	err = categoryCollection.FindOne(ctx, filter).Decode(&foundCategory)
 	if err != nil && err != mongo.ErrNoDocuments {
 		return nil, err
 	}
@@ -81,11 +137,7 @@ func CreateCategory(category *models.Category, userName string) (*mongo.InsertOn
 		return nil, errors.New(msg)
 	}
 
-	category.UserID, err = utils.GetUserIDfromUsername(userName)
-	if err != nil {
-		return nil, err
-	}
-
+	category.UserID = userID
 	category.ID = primitive.NewObjectID()
 	category.UserMade = true
 	category.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
@@ -94,11 +146,8 @@ func CreateCategory(category *models.Category, userName string) (*mongo.InsertOn
 	return categoryCollection.InsertOne(context.Background(), category)
 }
 
-func CreateExpense(expense *models.Expense, category string, userName string) (*mongo.InsertOneResult, error) {
-	expense.ID = primitive.NewObjectID()
-	expense.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
-	expense.UpdatedAt = expense.CreatedAt
-
+func GetCategoryByName(name string) (*models.Category, error) {
+	var category models.Category
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -113,7 +162,20 @@ func CreateExpense(expense *models.Expense, category string, userName string) (*
 		}
 		return nil, err
 	}
-	expense.Category = foundCategory
+	return &foundCategory, nil
+}
+
+func CreateExpense(expense *models.Expense, category string, userName string) (*mongo.InsertOneResult, error) {
+	expense.ID = primitive.NewObjectID()
+	expense.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
+	expense.UpdatedAt = expense.CreatedAt
+
+	foundCategory, err := GetCategoryByName(category)
+	if err != nil {
+		return nil, err
+	}
+
+	expense.Category = *foundCategory
 
 	expense.UserID, err = utils.GetUserIDfromUsername(userName)
 	if err != nil {
@@ -123,8 +185,25 @@ func CreateExpense(expense *models.Expense, category string, userName string) (*
 	return expenseCollection.InsertOne(context.Background(), expense)
 }
 
-func UpdateExpense(expense *models.Expense) (*mongo.UpdateResult, error) {
-	return expenseCollection.UpdateOne(context.Background(), bson.M{"_id": expense.ID}, bson.M{"$set": expense})
+func UpdateExpense(id string, expense *models.Expense) (*mongo.UpdateResult, error) {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	existingExpense, err := GetExpenseById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if expense.Name != "" {
+		existingExpense.Name = expense.Name
+	}
+	if expense.Price != 0 {
+		existingExpense.Price = expense.Price
+	}
+
+	return expenseCollection.UpdateOne(context.Background(), bson.M{"_id": objectID}, bson.M{"$set": expense})
 }
 
 func DeleteExpense(id string) (*mongo.DeleteResult, error) {
