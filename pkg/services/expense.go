@@ -23,8 +23,8 @@ func CreateExpense(expense *models.Expense, category string, userName string) er
 	return err
 }
 
-func UpdateExpense(id string, expense *models.Expense) error {
-	_, err := repository.UpdateExpense(id, expense)
+func UpdateExpense(id string, expense *models.Expense, category string) error {
+	_, err := repository.UpdateExpense(id, expense, category)
 	return err
 }
 

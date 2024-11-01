@@ -92,14 +92,34 @@ func CreateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 
 func UpdateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
+
+	var rawBody map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&rawBody)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	var category string
+	if rawBody["category"] != nil {
+		category = rawBody["category"].(string)
+	}
+
 	var expense models.Expense
-	json.NewDecoder(r.Body).Decode(&expense)
-	err := services.UpdateExpense(params["id"], &expense)
+	expenseData, err := json.Marshal(rawBody)
+	if err != nil {
+		http.Error(w, "Error processing expense data", http.StatusInternalServerError)
+		return
+	}
+
+	json.Unmarshal(expenseData, &expense)
+	err = services.UpdateExpense(params["id"], &expense, category)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(expense)
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Expense updated successfully"))
 }
 
 func DeleteExpenseHandler(w http.ResponseWriter, r *http.Request) {
@@ -109,6 +129,9 @@ func DeleteExpenseHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Expense deleted successfully"))
 }
 
 func GetExpenseByIdHandler(w http.ResponseWriter, r *http.Request) {
