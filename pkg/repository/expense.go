@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var expenseCollection *mongo.Collection
@@ -43,7 +44,10 @@ func GetExpenses(userName string) ([]models.Expense, error) {
 		return nil, err
 	}
 
-	cursor, err := expenseCollection.Find(ctx, bson.M{"user_id": UserID})
+	opts := options.Find()
+	opts.SetSort(bson.D{{Key: "created_at", Value: -1}})
+
+	cursor, err := expenseCollection.Find(ctx, bson.M{"user_id": UserID}, opts)
 	if err != nil {
 		return nil, err
 	}
