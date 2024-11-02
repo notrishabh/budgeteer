@@ -16,7 +16,7 @@ var JwtKey = []byte("your_secret_key") // Secret key for signing
 
 // GenerateJWT generates a new JWT token for an authenticated user
 func GenerateJWT(username, role string) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
+	expirationTime := time.Now().Add(24 * time.Hour * 10) // Token valid for 10 days
 	claims := &Claims{
 		Username: username,
 		Role:     role,
