@@ -48,7 +48,7 @@ export default function Login() {
   }
 
   return (
-    <section>
+    <section className="px-6 py-8">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -71,7 +71,7 @@ export default function Login() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} type="password" />
                 </FormControl>
                 <FormMessage />
               </FormItem>

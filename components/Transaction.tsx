@@ -17,11 +17,11 @@ export default function Transaction({ data }: { data: TTransaction }) {
         <AvatarImage src="https://github.com/shadcn.png" />
         <AvatarFallback>CN</AvatarFallback>
       </Avatar>
-      <div>
-        <h4 className="text-lg leading-6 font-semibold">{data.name}</h4>
-        <p className="text-sm text-muted-foreground">{data.category.name}</p>
-      </div>
-      <div className="ml-auto">
+      <div className="flex justify-between w-full">
+        <div>
+          <h4 className="text-lg leading-6 font-semibold">{data.name}</h4>
+          <p className="text-sm text-muted-foreground">{data.category.name}</p>
+        </div>
         <h4 className="font-semibold text-xl text-orange-600">
           -₹ {data.price}
         </h4>

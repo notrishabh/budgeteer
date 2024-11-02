@@ -11,5 +11,6 @@ export function formatDate(date: string) {
   return {
     day: d.getDate(),
     month: d.toLocaleString("default", { month: "short" }),
+    date: d.toDateString(),
   };
 }

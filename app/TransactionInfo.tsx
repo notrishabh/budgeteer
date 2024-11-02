@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TTransaction } from "@/types/types";
-import Transaction from "./Transaction";
+import Transaction from "../components/Transaction";
 
 export default function TransactionInfo() {
   const { data, isLoading } = useQuery<TTransaction[]>({
