@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, X } from "lucide-react";
@@ -26,6 +27,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 export default function AddTransaction() {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
@@ -39,11 +41,23 @@ export default function AddTransaction() {
         credentials: "include",
         body: JSON.stringify(body),
       });
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        throw new Error(errorMessage.error);
+      }
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      setOpen(false);
+    },
+    onError: (err) => {
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+        duration: 3000,
+        className: "p-2",
+      });
     },
   });
   const formSchema = z.object({
@@ -55,7 +69,12 @@ export default function AddTransaction() {
     resolver: zodResolver(formSchema),
   });
   function onSubmit(data: z.infer<typeof formSchema>) {
-    mutate(data);
+    mutate(data, {
+      onSuccess: () => {
+        form.reset();
+        setOpen(false);
+      },
+    });
   }
 
   return (

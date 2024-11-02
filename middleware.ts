@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtDecode } from "jwt-decode";
 
 // 1. Specify protected and public routes
-const protectedRoutes = ["/"];
+const protectedRoutes = ["/", "/transactions"];
 const publicRoutes = ["/login", "/signup"];
 
 export default async function middleware(req: NextRequest) {

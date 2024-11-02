@@ -15,8 +15,10 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
+  const { toast } = useToast();
   const router = useRouter();
   const { mutate } = useMutation({
     mutationFn: async (body: { username: string; password: string }) => {
@@ -29,6 +31,15 @@ export default function Login() {
     },
     onSuccess: () => {
       router.push("/");
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Something went wrong",
+        variant: "destructive",
+        duration: 2000,
+        className: "p-2",
+      });
     },
   });
 

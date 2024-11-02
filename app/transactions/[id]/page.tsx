@@ -13,9 +13,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/utils";
 import { TTransaction } from "@/types/types";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -52,9 +53,7 @@ export default function TransactionDetails({
         </Button>
         Details
         <div>
-          <Button size="icon" variant="ghost" onClick={handleGoBack}>
-            <Trash2 />
-          </Button>
+          <RenderAlertDialog params={params} />
         </div>
       </div>
       {isLoading || !data ? (
@@ -83,15 +82,50 @@ export default function TransactionDetails({
           </div>
         </section>
       )}
-      <RenderAlertDialog />
     </section>
   );
 }
 
-const RenderAlertDialog = () => {
+const RenderAlertDialog = ({ params }: { params: { id: string } }) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const { mutate } = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(
+        "http://localhost:8080/expenses/" + params.id,
+        {
+          method: "DELETE",
+          credentials: "include",
+        },
+      );
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Something went wrong",
+        variant: "destructive",
+        duration: 2000,
+        className: "p-2",
+      });
+    },
+  });
+  const handleDelete = () => {
+    mutate(undefined, {
+      onSuccess: () => {
+        router.push("/");
+      },
+    });
+  };
   return (
     <AlertDialog>
-      <AlertDialogTrigger>Open</AlertDialogTrigger>
+      <AlertDialogTrigger>
+        <Trash2 />
+      </AlertDialogTrigger>
       <AlertDialogContent className="w-5/6 rounded-xl">
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -102,7 +136,12 @@ const RenderAlertDialog = () => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction
+            className="bg-red-600 hover:bg-red-700"
+            onClick={handleDelete}
+          >
+            Delete
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
