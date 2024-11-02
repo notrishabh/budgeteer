@@ -10,6 +10,10 @@ import (
 	"github.com/notrishabh/finance-tracker/pkg/services"
 )
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 func GetExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	user := middleware.GetUserFromContext(r.Context())
 	if user == nil {
@@ -84,7 +88,12 @@ func CreateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(expenseData, &expense)
 	error := services.CreateExpense(&expense, category, user.Username)
 	if error != nil {
-		http.Error(w, error.Error(), http.StatusInternalServerError)
+		errorResponse := ErrorResponse{Error: error.Error()}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		if err := json.NewEncoder(w).Encode(errorResponse); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 	json.NewEncoder(w).Encode(expense)
@@ -118,8 +127,10 @@ func UpdateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Expense updated successfully"))
+	response := map[string]interface{}{
+		"message": "Expense updated successfully",
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
 func DeleteExpenseHandler(w http.ResponseWriter, r *http.Request) {
@@ -129,9 +140,10 @@ func DeleteExpenseHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Expense deleted successfully"))
+	response := map[string]interface{}{
+		"message": "Expense deleted successfully",
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
 func GetExpenseByIdHandler(w http.ResponseWriter, r *http.Request) {
