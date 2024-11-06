@@ -18,15 +18,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { TTransaction } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, X } from "lucide-react";
+import { Pencil, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 export default function EditTransaction({ data }: { data: TTransaction }) {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
@@ -35,16 +37,32 @@ export default function EditTransaction({ data }: { data: TTransaction }) {
       price: number;
       category: string;
     }) => {
-      const response = await fetch("http://localhost:8080/expenses", {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify(body),
-      });
+      const response = await fetch(
+        "http://localhost:8080/expenses/" + data.id,
+        {
+          method: "PATCH",
+          credentials: "include",
+          body: JSON.stringify(body),
+        },
+      );
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      setOpen(false);
+      queryClient.invalidateQueries({
+        queryKey: ["transactions"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["transactions-details", data.id],
+      });
+    },
+    onError: (err) => {
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+        duration: 3000,
+        className: "p-2",
+      });
     },
   });
   const formSchema = z.object({
@@ -53,38 +71,49 @@ export default function EditTransaction({ data }: { data: TTransaction }) {
     category: z.string(),
   });
   const form = useForm<z.infer<typeof formSchema>>({
+    defaultValues: {
+      name: data.name,
+      price: data.price,
+      category: data.category.name,
+    },
     resolver: zodResolver(formSchema),
   });
   function onSubmit(data: z.infer<typeof formSchema>) {
-    mutate(data);
+    mutate(data, {
+      onSuccess: () => {
+        setOpen(false);
+      },
+    });
   }
 
   return (
     <Drawer open={open}>
       <DrawerTrigger asChild>
-        <Button size="icon" onClick={() => setOpen(true)}>
-          <Plus />
+        <Button size="icon" variant="ghost" onClick={() => setOpen(true)}>
+          <Pencil />
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="h-full bg-white px-6">
-        <DrawerHeader className="relative">
+      <DrawerContent className="h-full bg-white">
+        <DrawerHeader className="flex justify-between items-center">
           <DrawerClose>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute left-0 top-3"
-              onClick={() => setOpen(false)}
-            >
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
               <X />
             </Button>
           </DrawerClose>
-          <DrawerTitle>Add an expense</DrawerTitle>
+          <DrawerTitle className="ml-8">Edit expense</DrawerTitle>
+          <Button
+            variant="link"
+            className="font-semibold text-green-600 text-md"
+            onClick={form.handleSubmit(onSubmit)}
+          >
+            Save
+          </Button>
         </DrawerHeader>
         <Form {...form}>
           <form
             autoComplete="off"
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8 pt-20"
+            className="space-y-8 pt-20 px-6"
           >
             <FormField
               control={form.control}
@@ -125,9 +154,6 @@ export default function EditTransaction({ data }: { data: TTransaction }) {
                 </FormItem>
               )}
             />
-            <DrawerFooter>
-              <Button type="submit">Submit</Button>
-            </DrawerFooter>
           </form>
         </Form>
       </DrawerContent>

@@ -1,4 +1,5 @@
 "use client";
+import EditTransaction from "@/components/EditTransaction";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/utils";
 import { TTransaction } from "@/types/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, Trash2 } from "lucide-react";
+import { ChevronLeft, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function TransactionDetails({
@@ -51,15 +52,16 @@ export default function TransactionDetails({
         <Button size="icon" variant="ghost" onClick={handleGoBack}>
           <ChevronLeft />
         </Button>
-        Details
-        <div>
+        <span className="font-semibold">Details</span>
+        <div className="flex gap-6">
           <RenderAlertDialog params={params} />
+          {!isLoading && data ? <EditTransaction data={data} /> : <Pencil />}
         </div>
       </div>
       {isLoading || !data ? (
         <Skeleton className="rounded-xl h-24 w-full" />
       ) : (
-        <section className="px-2">
+        <section className="px-2 pt-4">
           <div className="flex gap-4">
             <Avatar className="rounded-xl">
               <AvatarImage src="https://github.com/shadcn.png" />
