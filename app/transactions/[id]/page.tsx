@@ -19,7 +19,7 @@ import { formatDate } from "@/lib/utils";
 import { TTransaction } from "@/types/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, Pencil, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 export default function TransactionDetails({
   params,
