@@ -21,10 +21,32 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, X } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "./ui/command";
+import { cn } from "@/lib/utils";
+
+const languages = [
+  { label: "English", value: "en" },
+  { label: "French", value: "fr" },
+  { label: "German", value: "de" },
+  { label: "Spanish", value: "es" },
+  { label: "Portuguese", value: "pt" },
+  { label: "Russian", value: "ru" },
+  { label: "Japanese", value: "ja" },
+  { label: "Korean", value: "ko" },
+  { label: "Chinese", value: "zh" },
+] as const;
 
 export default function AddTransaction() {
   const { toast } = useToast();
@@ -63,18 +85,21 @@ export default function AddTransaction() {
   const formSchema = z.object({
     name: z.string(),
     price: z.coerce.number(),
-    category: z.string(),
+    category: z.string({
+      required_error: "Please select a category",
+    }),
   });
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
   function onSubmit(data: z.infer<typeof formSchema>) {
-    mutate(data, {
-      onSuccess: () => {
-        form.reset();
-        setOpen(false);
-      },
-    });
+    //mutate(data, {
+    //  onSuccess: () => {
+    //    form.reset();
+    //    setOpen(false);
+    //  },
+    //});
+    console.log(data);
   }
 
   return (
@@ -84,25 +109,27 @@ export default function AddTransaction() {
           <Plus />
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="h-full bg-white px-6">
-        <DrawerHeader className="relative">
+      <DrawerContent className="h-full bg-white">
+        <DrawerHeader className="flex justify-between items-center">
           <DrawerClose>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute left-0 top-3"
-              onClick={() => setOpen(false)}
-            >
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
               <X />
             </Button>
           </DrawerClose>
-          <DrawerTitle>Add an expense</DrawerTitle>
+          <DrawerTitle className="ml-8">Add expense</DrawerTitle>
+          <Button
+            variant="link"
+            className="font-semibold text-green-600 text-md"
+            onClick={form.handleSubmit(onSubmit)}
+          >
+            Save
+          </Button>
         </DrawerHeader>
         <Form {...form}>
           <form
             autoComplete="off"
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8 pt-20"
+            className="space-y-8 pt-20 px-16"
           >
             <FormField
               control={form.control}
@@ -134,18 +161,62 @@ export default function AddTransaction() {
               control={form.control}
               name="category"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col space-y-3">
                   <FormLabel>Category</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            " justify-between",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value
+                            ? languages.find(
+                                (language) => language.value === field.value,
+                              )?.label
+                            : "Select category"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0">
+                      <Command>
+                        <CommandInput placeholder="Search category..." />
+                        <CommandList>
+                          <CommandEmpty>No language found.</CommandEmpty>
+                          <CommandGroup>
+                            {languages.map((language) => (
+                              <CommandItem
+                                value={language.label}
+                                key={language.value}
+                                onSelect={() => {
+                                  form.setValue("category", language.value);
+                                }}
+                              >
+                                {language.label}
+                                <Check
+                                  className={cn(
+                                    "ml-auto",
+                                    language.value === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0",
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <DrawerFooter>
-              <Button type="submit">Submit</Button>
-            </DrawerFooter>
           </form>
         </Form>
       </DrawerContent>
