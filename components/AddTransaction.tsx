@@ -4,7 +4,6 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -20,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronsUpDown, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -35,23 +34,27 @@ import {
   CommandList,
 } from "./ui/command";
 import { cn } from "@/lib/utils";
-
-const languages = [
-  { label: "English", value: "en" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Spanish", value: "es" },
-  { label: "Portuguese", value: "pt" },
-  { label: "Russian", value: "ru" },
-  { label: "Japanese", value: "ja" },
-  { label: "Korean", value: "ko" },
-  { label: "Chinese", value: "zh" },
-] as const;
+import { TCategory } from "@/types/types";
 
 export default function AddTransaction() {
   const { toast } = useToast();
+  const [categoryPopoverOpen, setCategoryPopoverOpen] =
+    useState<boolean>(false);
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { data: categories, isLoading } = useQuery<TCategory[]>({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const response = await fetch("http://localhost:8080/expenses/category", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response.json();
+    },
+  });
   const { mutate } = useMutation({
     mutationFn: async (body: {
       name: string;
@@ -93,13 +96,12 @@ export default function AddTransaction() {
     resolver: zodResolver(formSchema),
   });
   function onSubmit(data: z.infer<typeof formSchema>) {
-    //mutate(data, {
-    //  onSuccess: () => {
-    //    form.reset();
-    //    setOpen(false);
-    //  },
-    //});
-    console.log(data);
+    mutate(data, {
+      onSuccess: () => {
+        form.reset();
+        setOpen(false);
+      },
+    });
   }
 
   return (
@@ -163,7 +165,7 @@ export default function AddTransaction() {
               render={({ field }) => (
                 <FormItem className="flex flex-col space-y-3">
                   <FormLabel>Category</FormLabel>
-                  <Popover>
+                  <Popover open={categoryPopoverOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
@@ -173,41 +175,52 @@ export default function AddTransaction() {
                             " justify-between",
                             !field.value && "text-muted-foreground",
                           )}
+                          onClick={() => setCategoryPopoverOpen(true)}
                         >
                           {field.value
-                            ? languages.find(
-                                (language) => language.value === field.value,
-                              )?.label
+                            ? categories?.find(
+                                (category) => category.name === field.value,
+                              )?.name
                             : "Select category"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="p-0">
+                    <PopoverContent
+                      className="p-0"
+                      onInteractOutside={() => setCategoryPopoverOpen(false)}
+                    >
                       <Command>
                         <CommandInput placeholder="Search category..." />
                         <CommandList>
-                          <CommandEmpty>No language found.</CommandEmpty>
-                          <CommandGroup>
-                            {languages.map((language) => (
-                              <CommandItem
-                                value={language.label}
-                                key={language.value}
-                                onSelect={() => {
-                                  form.setValue("category", language.value);
-                                }}
-                              >
-                                {language.label}
-                                <Check
-                                  className={cn(
-                                    "ml-auto",
-                                    language.value === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0",
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
+                          <CommandEmpty>No category found.</CommandEmpty>
+                          <CommandGroup className="max-h-32 overflow-y-scroll">
+                            {!isLoading && categories ? (
+                              <>
+                                {categories.map((category: TCategory) => (
+                                  <CommandItem
+                                    value={category.name}
+                                    key={category.id}
+                                    onSelect={() => {
+                                      form.setValue("category", category.name);
+                                      setCategoryPopoverOpen(false);
+                                    }}
+                                  >
+                                    {category.name}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        category.name === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0",
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </>
+                            ) : (
+                              <></>
+                            )}
                           </CommandGroup>
                         </CommandList>
                       </Command>
