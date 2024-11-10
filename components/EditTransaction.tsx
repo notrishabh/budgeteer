@@ -103,6 +103,7 @@ export default function EditTransaction({ data }: { data: TTransaction }) {
       category: data.category.name,
     },
     resolver: zodResolver(formSchema),
+    mode: "onBlur",
   });
   function onSubmit(data: z.infer<typeof formSchema>) {
     mutate(data, {

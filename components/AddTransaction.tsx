@@ -35,10 +35,13 @@ import {
 } from "./ui/command";
 import { cn } from "@/lib/utils";
 import { TCategory } from "@/types/types";
+import AddCategoryDialog from "./AddCategoryDialog";
 
 export default function AddTransaction() {
   const { toast } = useToast();
   const [categoryPopoverOpen, setCategoryPopoverOpen] =
+    useState<boolean>(false);
+  const [addCategoryDialogOpen, setAddCategoryDialogOpen] =
     useState<boolean>(false);
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -94,6 +97,7 @@ export default function AddTransaction() {
   });
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onBlur",
   });
   function onSubmit(data: z.infer<typeof formSchema>) {
     mutate(data, {
@@ -192,8 +196,22 @@ export default function AddTransaction() {
                     >
                       <Command>
                         <CommandInput placeholder="Search category..." />
+                        <CommandItem>
+                          <AddCategoryDialog
+                            dialogOpen={addCategoryDialogOpen}
+                            setDialogOpen={setAddCategoryDialogOpen}
+                          />
+                        </CommandItem>
                         <CommandList>
-                          <CommandEmpty>No category found.</CommandEmpty>
+                          <CommandEmpty>
+                            No category found.
+                            <div className="p-2">
+                              <AddCategoryDialog
+                                dialogOpen={addCategoryDialogOpen}
+                                setDialogOpen={setAddCategoryDialogOpen}
+                              />
+                            </div>
+                          </CommandEmpty>
                           <CommandGroup className="max-h-32 overflow-y-scroll">
                             {!isLoading && categories ? (
                               <>
