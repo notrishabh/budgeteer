@@ -35,10 +35,13 @@ import {
   CommandList,
 } from "./ui/command";
 import { cn } from "@/lib/utils";
+import AddCategoryDialog from "./AddCategoryDialog";
 
 export default function EditTransaction({ data }: { data: TTransaction }) {
   const { toast } = useToast();
   const [categoryPopoverOpen, setCategoryPopoverOpen] =
+    useState<boolean>(false);
+  const [addCategoryDialogOpen, setAddCategoryDialogOpen] =
     useState<boolean>(false);
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -201,8 +204,22 @@ export default function EditTransaction({ data }: { data: TTransaction }) {
                     >
                       <Command>
                         <CommandInput placeholder="Search category..." />
+                        <CommandItem>
+                          <AddCategoryDialog
+                            dialogOpen={addCategoryDialogOpen}
+                            setDialogOpen={setAddCategoryDialogOpen}
+                          />
+                        </CommandItem>
                         <CommandList>
-                          <CommandEmpty>No category found.</CommandEmpty>
+                          <CommandEmpty>
+                            No category found.
+                            <div className="p-2">
+                              <AddCategoryDialog
+                                dialogOpen={addCategoryDialogOpen}
+                                setDialogOpen={setAddCategoryDialogOpen}
+                              />
+                            </div>
+                          </CommandEmpty>
                           <CommandGroup className="max-h-32 overflow-y-scroll">
                             {!isLoading && categories ? (
                               <>
