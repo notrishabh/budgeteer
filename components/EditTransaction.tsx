@@ -4,7 +4,6 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -19,18 +18,43 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { TTransaction } from "@/types/types";
+import { TCategory, TTransaction } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Pencil, X } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Check, ChevronsUpDown, Pencil, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "./ui/command";
+import { cn } from "@/lib/utils";
 
 export default function EditTransaction({ data }: { data: TTransaction }) {
   const { toast } = useToast();
+  const [categoryPopoverOpen, setCategoryPopoverOpen] =
+    useState<boolean>(false);
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { data: categories, isLoading } = useQuery<TCategory[]>({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const response = await fetch("http://localhost:8080/expenses/category", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response.json();
+    },
+  });
   const { mutate } = useMutation({
     mutationFn: async (body: {
       name: string;
@@ -68,7 +92,9 @@ export default function EditTransaction({ data }: { data: TTransaction }) {
   const formSchema = z.object({
     name: z.string(),
     price: z.coerce.number(),
-    category: z.string(),
+    category: z.string({
+      required_error: "Please select a category",
+    }),
   });
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
@@ -145,11 +171,69 @@ export default function EditTransaction({ data }: { data: TTransaction }) {
               control={form.control}
               name="category"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col space-y-3">
                   <FormLabel>Category</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
+                  <Popover open={categoryPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            " justify-between",
+                            !field.value && "text-muted-foreground",
+                          )}
+                          onClick={() => setCategoryPopoverOpen(true)}
+                        >
+                          {field.value
+                            ? categories?.find(
+                                (category) => category.name === field.value,
+                              )?.name
+                            : "Select category"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="p-0"
+                      onInteractOutside={() => setCategoryPopoverOpen(false)}
+                    >
+                      <Command>
+                        <CommandInput placeholder="Search category..." />
+                        <CommandList>
+                          <CommandEmpty>No category found.</CommandEmpty>
+                          <CommandGroup className="max-h-32 overflow-y-scroll">
+                            {!isLoading && categories ? (
+                              <>
+                                {categories.map((category: TCategory) => (
+                                  <CommandItem
+                                    value={category.name}
+                                    key={category.id}
+                                    onSelect={() => {
+                                      form.setValue("category", category.name);
+                                      setCategoryPopoverOpen(false);
+                                    }}
+                                  >
+                                    {category.name}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        category.name === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0",
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </>
+                            ) : (
+                              <></>
+                            )}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
