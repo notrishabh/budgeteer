@@ -1,7 +1,10 @@
+import TransactionInfo from "../TransactionInfo";
+
 export default function Transactions() {
   return (
-    <section>
-      <h1>Hi</h1>
+    <section className="px-6 py-8 space-y-4">
+      <h4 className="text-2xl font-bold">Transactions</h4>
+      <TransactionInfo />
     </section>
   );
 }
