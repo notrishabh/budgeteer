@@ -111,7 +111,10 @@ export default function AddTransaction() {
   return (
     <Drawer open={open}>
       <DrawerTrigger asChild>
-        <Button size="icon" onClick={() => setOpen(true)}>
+        <Button
+          className="h-11 bg-gradient-to-br from-green-600 via-green-700 to-green-400"
+          onClick={() => setOpen(true)}
+        >
           <Plus />
         </Button>
       </DrawerTrigger>
