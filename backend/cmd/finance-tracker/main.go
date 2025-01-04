@@ -5,12 +5,24 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/notrishabh/finance-tracker/internal/db"
 	"github.com/notrishabh/finance-tracker/pkg/repository"
 	"github.com/rs/cors"
 )
 
 func main() {
+	// Load environment variables from .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	db.Init()
 	repository.InitRepo()
 	repository.InitUserRepo()
@@ -22,9 +34,5 @@ func main() {
 		AllowCredentials: true,
 	})
 	handler := c.Handler(router)
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
 	log.Fatal(http.ListenAndServe(":"+port, handler))
 }

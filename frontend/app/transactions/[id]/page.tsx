@@ -34,7 +34,7 @@ export default function TransactionDetails({
     queryKey: ["transactions-details", params.id],
     queryFn: async () => {
       const response = await fetch(
-        "http://localhost:8080/expenses/" + params.id,
+        `${process.env.NEXT_PUBLIC_API_URL}/expenses/` + params.id,
         {
           method: "GET",
           credentials: "include",
@@ -95,7 +95,7 @@ const RenderAlertDialog = ({ params }: { params: { id: string } }) => {
   const { mutate } = useMutation({
     mutationFn: async () => {
       const response = await fetch(
-        "http://localhost:8080/expenses/" + params.id,
+        `${process.env.NEXT_PUBLIC_API_URL}/expenses/` + params.id,
         {
           method: "DELETE",
           credentials: "include",

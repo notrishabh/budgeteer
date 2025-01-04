@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,12 +13,12 @@ import (
 
 var Client *mongo.Client
 
-var user = "rishabh107107"
-var pass = "X0OOZSVpEuCKVFGS"
-
-var uri = fmt.Sprintf("mongodb+srv://%s:%s@finance-tracker.oc3xv.mongodb.net/?retryWrites=true&w=majority&appName=finance-tracker", user, pass)
-
 func Init() {
+	var user = os.Getenv("DB_USER")
+	var pass = os.Getenv("DB_PASS")
+
+	var uri = fmt.Sprintf("mongodb+srv://%s:%s@finance-tracker.oc3xv.mongodb.net/?retryWrites=true&w=majority&appName=finance-tracker", user, pass)
+
 	// Use the SetServerAPIOptions() method to set the version of the Stable API on the client
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

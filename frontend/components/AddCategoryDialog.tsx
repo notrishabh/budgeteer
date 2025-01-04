@@ -37,7 +37,7 @@ export default function AddCategoryDialog({
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: async (body: { name: string }) => {
-      const response = await fetch("http://localhost:8080/expenses/category", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/category`, {
         method: "POST",
         credentials: "include",
         body: JSON.stringify(body),

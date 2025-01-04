@@ -22,7 +22,7 @@ export default function Login() {
   const router = useRouter();
   const { mutate } = useMutation({
     mutationFn: async (body: { username: string; password: string }) => {
-      const response = await fetch("http://localhost:8080/login", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
         method: "POST",
         credentials: "include",
         body: JSON.stringify(body),

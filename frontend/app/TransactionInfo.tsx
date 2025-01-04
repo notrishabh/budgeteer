@@ -10,7 +10,7 @@ export default function TransactionInfo() {
   const { data, isLoading } = useQuery<TTransaction[]>({
     queryKey: ["transactions"],
     queryFn: async () => {
-      const response = await fetch("http://localhost:8080/expenses", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses`, {
         method: "GET",
         credentials: "include",
         headers: {
