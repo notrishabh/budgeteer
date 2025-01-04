@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/notrishabh/finance-tracker/internal/db"
 	"github.com/notrishabh/finance-tracker/pkg/repository"
@@ -21,5 +22,9 @@ func main() {
 		AllowCredentials: true,
 	})
 	handler := c.Handler(router)
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
