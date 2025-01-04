@@ -1,0 +1,27 @@
+services:
+  frontend:
+    build:
+      context: ./frontend # Path to frontend directory
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Expose Next.js on port 3000
+    volumes:
+      - ./frontend:/frontend # Mount local frontend directory to /frontend in the container
+    environment:
+      - NODE_ENV=development
+    command: npm run dev # Run in development mode (hot reload enabled)
+
+  backend:
+    build:
+      context: ./backend # Path to backend directory
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080" # Expose Go app on port 8080
+    volumes:
+      - ./backend:/backend # Mount local backend directory to /backend in the container
+    environment:
+      - ENV_VAR=value # Add any environment variables if necessary
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    command: go run ./cmd/finance-tracker/ . # Run Go app in development mode
