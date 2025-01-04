@@ -64,5 +64,5 @@ const LastMonthHeading = ({
   setLastMonth: (arg0: string) => void;
 }) => {
   setLastMonth(txnMonth);
-  return <p>hi</p>;
+  return <p>{lastMonth}</p>;
 };
