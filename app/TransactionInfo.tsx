@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TTransaction } from "@/types/types";
 import Transaction from "../components/Transaction";
+import { useState } from "react";
 
 export default function TransactionInfo() {
   const { data, isLoading } = useQuery<TTransaction[]>({
@@ -19,6 +20,7 @@ export default function TransactionInfo() {
       return response.json();
     },
   });
+  const [lastMonth, setLastMonth] = useState<string>("");
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -33,7 +35,16 @@ export default function TransactionInfo() {
       <div className="space-y-4">
         {data ? (
           data.map((transaction: TTransaction) => (
-            <Transaction key={transaction.id} data={transaction} />
+            <>
+              {(lastMonth === "" || lastMonth != "Nov") && (
+                <LastMonthHeading
+                  lastMonth={lastMonth}
+                  setLastMonth={setLastMonth}
+                  txnMonth={"Nov"}
+                />
+              )}
+              <Transaction key={transaction.id} data={transaction} />
+            </>
           ))
         ) : (
           <p>No transactions found.</p>
@@ -42,3 +53,16 @@ export default function TransactionInfo() {
     );
   }
 }
+
+const LastMonthHeading = ({
+  lastMonth,
+  txnMonth,
+  setLastMonth,
+}: {
+  lastMonth: string;
+  txnMonth: string;
+  setLastMonth: (arg0: string) => void;
+}) => {
+  setLastMonth(txnMonth);
+  return <p>hi</p>;
+};

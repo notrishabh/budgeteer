@@ -19,7 +19,6 @@ const navMenuStyles = cva(
 
 export default function BottomBar() {
   const pathname = usePathname();
-  console.log(pathname);
   const isLoginPage = pathname === "/login";
   if (isLoginPage) {
     return null;

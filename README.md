@@ -10,7 +10,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## TODO
 
-- Bottom bar routing (Home, Categories, Transactions, Add Txn, User), Current tab highlight
 - Transaction page (Group by month)
 - Home page (login) (6)
 - Sign up page (5)
