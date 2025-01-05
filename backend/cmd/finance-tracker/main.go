@@ -23,16 +23,23 @@ func main() {
 		port = "8080"
 	}
 
+	cors_origin := os.Getenv("CORS_ORIGIN")
+	if cors_origin == "" {
+		log.Fatal("CORS_ORIGIN is not set to the frontend URL in env var")
+	}
+
 	db.Init()
 	repository.InitRepo()
 	repository.InitUserRepo()
 	router := InitRouter()
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedOrigins:   []string{cors_origin},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Cookie"},
 		AllowCredentials: true,
 	})
 	handler := c.Handler(router)
+
+	log.Printf("Server starting on port %s...\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
