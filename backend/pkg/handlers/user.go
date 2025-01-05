@@ -62,6 +62,7 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	if os.Getenv("ENV") == "prod" {
 		cookie.Secure = true
 		cookie.SameSite = http.SameSiteNoneMode
+		cookie.Partitioned = true
 	}
 
 	http.SetCookie(w, cookie)
