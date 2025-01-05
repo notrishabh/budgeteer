@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 
 	"github.com/notrishabh/finance-tracker/pkg/models"
 	"github.com/notrishabh/finance-tracker/pkg/services"
@@ -49,14 +50,21 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		"message": "User logged in successfully",
 	}
 
-	http.SetCookie(w, &http.Cookie{
+	cookie := &http.Cookie{
 		Name:     "token",
 		Value:    token,
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   false, // Only for HTTPS
 		SameSite: http.SameSiteLaxMode,
-	})
+	}
+
+	if os.Getenv("ENV") == "prod" {
+		cookie.Secure = true
+		cookie.SameSite = http.SameSiteNoneMode
+	}
+
+	http.SetCookie(w, cookie)
 
 	json.NewEncoder(w).Encode(response)
 }
