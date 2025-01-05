@@ -24,4 +24,4 @@ services:
     dns:
       - 8.8.8.8
       - 8.8.4.4
-    command: go run ./cmd/finance-tracker/ . # Run Go app in development mode
+    command: go run . # Run Go app in development mode

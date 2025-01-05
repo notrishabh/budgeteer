@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 8080
 
 # Run the Go application
-CMD ["go", "run", "main.go"]
+CMD ["go", "run", "."]
