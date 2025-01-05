@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 8080
 
 # Run the Go application
-CMD ["go", "run", "./cmd/finance-tracker/main.go"]
+CMD ["go", "run", "main.go"]
