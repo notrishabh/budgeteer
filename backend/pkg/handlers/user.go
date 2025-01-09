@@ -62,6 +62,7 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	if os.Getenv("ENV") == "prod" {
 		cookie.Secure = true
 		cookie.Domain = os.Getenv("CORS_ORIGIN")
+		cookie.SameSite = http.SameSiteNoneMode
 	}
 
 	http.SetCookie(w, cookie)
