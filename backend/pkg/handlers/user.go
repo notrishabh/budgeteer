@@ -63,7 +63,7 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		cookie.Secure = true
 		cookie.SameSite = http.SameSiteNoneMode
 		cookie.Partitioned = true
-		cookie.Domain = "https://budgeteer-go.onrender.com"
+		cookie.Domain = "budgeteer-lake.vercel.app"
 	}
 
 	http.SetCookie(w, cookie)
