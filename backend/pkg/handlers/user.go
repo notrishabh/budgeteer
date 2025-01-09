@@ -51,18 +51,17 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie := &http.Cookie{
-		Name:     "token",
+		Name:     "jwttoken",
 		Value:    token,
 		Path:     "/",
-		HttpOnly: true,
 		Secure:   false, // Only for HTTPS
 		SameSite: http.SameSiteLaxMode,
 	}
 
 	if os.Getenv("ENV") == "prod" {
-		cookie.Secure = true
-		cookie.Domain = os.Getenv("CORS_ORIGIN")
 		cookie.SameSite = http.SameSiteNoneMode
+		cookie.Partitioned = true
+		cookie.Domain = os.Getenv("CORS_ORIGIN")
 	}
 
 	http.SetCookie(w, cookie)
