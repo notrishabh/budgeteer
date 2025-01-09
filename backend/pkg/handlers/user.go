@@ -63,7 +63,7 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		cookie.Secure = true
 		cookie.SameSite = http.SameSiteNoneMode
 		cookie.Partitioned = true
-		cookie.Domain = "." + os.Getenv("CORS_ORIGIN")
+		cookie.Domain = os.Getenv("CORS_ORIGIN")
 	}
 
 	http.SetCookie(w, cookie)
