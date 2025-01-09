@@ -51,7 +51,7 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie := &http.Cookie{
-		Name:     "jwt",
+		Name:     "token",
 		Value:    token,
 		Path:     "/",
 		HttpOnly: true,
@@ -63,7 +63,7 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		cookie.Secure = true
 		cookie.SameSite = http.SameSiteNoneMode
 		cookie.Partitioned = true
-		cookie.Domain = os.Getenv("CORS_ORIGIN")
+		cookie.Domain = "https://budgeteer-go.onrender.com"
 	}
 
 	http.SetCookie(w, cookie)
