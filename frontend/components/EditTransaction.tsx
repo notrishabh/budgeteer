@@ -48,7 +48,7 @@ export default function EditTransaction({ data }: { data: TTransaction }) {
   const { data: categories, isLoading } = useQuery<TCategory[]>({
     queryKey: ["categories"],
     queryFn: async () => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/category`, {
+      const response = await fetch("/api/expenses/category", {
         method: "GET",
         credentials: "include",
         headers: {
