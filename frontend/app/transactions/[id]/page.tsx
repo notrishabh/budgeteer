@@ -33,16 +33,13 @@ export default function TransactionDetails({
   const { data, isLoading } = useQuery<TTransaction>({
     queryKey: ["transactions-details", params.id],
     queryFn: async () => {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses/` + params.id,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
+      const response = await fetch("/api/expenses/" + params.id, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+      });
       return response.json();
     },
   });
@@ -94,13 +91,10 @@ const RenderAlertDialog = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   const { mutate } = useMutation({
     mutationFn: async () => {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses/` + params.id,
-        {
-          method: "DELETE",
-          credentials: "include",
-        },
-      );
+      const response = await fetch("/api/expenses/" + params.id, {
+        method: "DELETE",
+        credentials: "include",
+      });
       return response.json();
     },
     onSuccess: () => {

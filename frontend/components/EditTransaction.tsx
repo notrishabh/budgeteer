@@ -64,14 +64,11 @@ export default function EditTransaction({ data }: { data: TTransaction }) {
       price: number;
       category: string;
     }) => {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/expenses/` + data.id,
-        {
-          method: "PATCH",
-          credentials: "include",
-          body: JSON.stringify(body),
-        },
-      );
+      const response = await fetch("/api/expenses/" + data.id, {
+        method: "PATCH",
+        credentials: "include",
+        body: JSON.stringify(body),
+      });
       return response.json();
     },
     onSuccess: () => {

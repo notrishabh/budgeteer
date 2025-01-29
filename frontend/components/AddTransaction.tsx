@@ -48,7 +48,7 @@ export default function AddTransaction() {
   const { data: categories, isLoading } = useQuery<TCategory[]>({
     queryKey: ["categories"],
     queryFn: async () => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/category`, {
+      const response = await fetch("/api/expenses/category", {
         method: "GET",
         credentials: "include",
         headers: {
@@ -64,7 +64,7 @@ export default function AddTransaction() {
       price: number;
       category: string;
     }) => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses`, {
+      const response = await fetch("/api/expenses", {
         method: "POST",
         credentials: "include",
         body: JSON.stringify(body),
