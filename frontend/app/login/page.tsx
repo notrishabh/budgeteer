@@ -16,26 +16,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function Login() {
   const { toast } = useToast();
   const router = useRouter();
+
+  const [showSignup, setShowSignup] = useState(false);
+
   const { mutate } = useMutation({
     mutationFn: async (body: { username: string; password: string }) => {
-      const response = await fetch("/api/login", {
+      const response = await fetch(`/api/${showSignup ? "user" : "login"}`, {
         method: "POST",
         credentials: "include",
         body: JSON.stringify(body),
       });
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        throw new Error(errorMessage.error || "Something went wrong");
+      }
       return response.json();
     },
     onSuccess: () => {
       router.push("/");
+      toast({
+        title: "Success 🎉",
+        description: "Logged in",
+        variant: "default",
+        duration: 2000,
+        className: "p-2",
+      });
     },
-    onError: () => {
+    onError: (err) => {
       toast({
         title: "Error",
-        description: "Something went wrong",
+        description: err.message,
         variant: "destructive",
         duration: 2000,
         className: "p-2",
@@ -120,10 +135,17 @@ export default function Login() {
               )}
             />
             <Button type="submit" className="w-full p-6 rounded-lg">
-              Sign In
+              {showSignup ? "Create Account" : "Sign In"}
             </Button>
           </form>
         </Form>
+        <Button
+          variant="link"
+          className="text-blue-800 float-right p-0 mt-2"
+          onClick={() => setShowSignup((prev) => !prev)}
+        >
+          {showSignup ? "Login to an existing account" : "Create Account"}
+        </Button>
       </div>
     </section>
   );
